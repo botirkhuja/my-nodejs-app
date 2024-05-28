@@ -14,7 +14,17 @@ export interface PhoneI {
   has_touchscreen: boolean;
 }
 
-interface PhoneCreationI extends Optional<PhoneI, 'id'> {};
+export interface PhoneQueryI {
+  name?: string;
+  storage?: string;
+  storageType?: string;
+  audioJack?: string;
+  wifi?: string;
+  camera?: string;
+  touchscreen?: string;
+}
+
+export interface PhoneCreationI extends Optional<PhoneI, 'id'> {};
 
 class Phone extends Model<PhoneI, PhoneCreationI> implements PhoneI {
   public id!: number;
