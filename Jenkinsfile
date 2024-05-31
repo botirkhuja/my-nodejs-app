@@ -56,10 +56,7 @@ pipeline {
       echo 'Build failed.'
     }
     always {
-      agent {
-        label 'ec2-agent'
-      }
-      steps {
+      node('ec2-agent') {
         sh 'docker rmi $(docker images -q)'
         cleanWs()
       }
