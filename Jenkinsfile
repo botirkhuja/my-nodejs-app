@@ -21,17 +21,17 @@ pipeline {
         sh 'docker ps'
       }
     }
-    // stage('Build Docker Image') {
-    //   agent {
-    //     label 'ec2-agent'
-    //   }
-    //   steps {
-    //     script {
-    //       // Build Docker image from Dockerfile
-    //       sh "docker build -f dockerfile -t ${IMAGE_NAME} ."
-    //     }
-    //   }
-    // }
+    stage('Build Docker Image') {
+      agent {
+        label 'ec2-agent'
+      }
+      steps {
+        script {
+          // Build Docker image from Dockerfile
+          sh "docker build -f dockerfile -t ${IMAGE_NAME} ."
+        }
+      }
+    }
     // stage('Deploy Image') {
     //   agent {
     //     label 'ec2-agent'
