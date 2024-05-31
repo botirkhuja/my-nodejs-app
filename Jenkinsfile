@@ -32,19 +32,19 @@ pipeline {
         }
       }
     }
-    // stage('Deploy Image') {
-    //   agent {
-    //     label 'ec2-agent'
-    //   }
-    //   steps{
-    //     script {
-    //       docker.withRegistry( '', registryCredential ) {
-    //         dockerImage.push("$BUILD_NUMBER")
-    //         dockerImage.push('latest')
-    //       }
-    //     }
-    //   }
-    // }
+    stage('Deploy Image') {
+      agent {
+        label 'ec2-agent'
+      }
+      steps{
+        script {
+          docker.withRegistry( '', registryCredential ) {
+            dockerImage.push("$BUILD_NUMBER")
+            dockerImage.push('latest')
+          }
+        }
+      }
+    }
   }
   // post {
   //   success {
