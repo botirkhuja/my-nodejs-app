@@ -1,6 +1,7 @@
 pipeline {
   environment {
     registryCredential = 'docker-botirkhuja-creds'
+    dockerBuildImage = ''
     IMAGE_NAME = 'botirkhuja/node-express-app'
   }
   agent any
@@ -29,6 +30,7 @@ pipeline {
         script {
           // Build Docker image from Dockerfile
           sh "docker build -f dockerfile -t ${IMAGE_NAME} ."
+          dockerBuildImage = docker.build(IMAGE_NAME);
         }
       }
     }
@@ -39,28 +41,28 @@ pipeline {
       steps{
         script {
           docker.withRegistry( '', registryCredential ) {
-            dockerImage.push("$BUILD_NUMBER")
-            dockerImage.push('latest')
+            dockerBuildImage.push("$BUILD_NUMBER")
+            dockerBuildImage.push('latest')
           }
         }
       }
     }
   }
-  // post {
-  //   success {
-  //     echo 'Build completed successfully.'
-  //   }
-  //   failure {
-  //     echo 'Build failed.'
-  //   }
-  //   always {
-  //     agent {
-  //       label 'ec2-agent'
-  //     }
-  //     steps {
-  //       sh 'docker rmi $(docker images -q)'
-  //       cleanWs()
-  //     }
-  //   }
-  // }
+  post {
+    success {
+      echo 'Build completed successfully.'
+    }
+    failure {
+      echo 'Build failed.'
+    }
+    always {
+      agent {
+        label 'ec2-agent'
+      }
+      steps {
+        sh 'docker rmi $(docker images -q)'
+        cleanWs()
+      }
+    }
+  }
 }
