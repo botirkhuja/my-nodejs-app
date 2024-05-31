@@ -57,7 +57,7 @@ pipeline {
     }
     always {
       node('ec2-agent') {
-        sh 'docker rmi $(docker images -q)'
+        sh 'docker rmi $(docker images -q) --force'
         cleanWs()
       }
     }
