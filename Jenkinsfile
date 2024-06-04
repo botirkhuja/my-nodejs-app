@@ -47,6 +47,17 @@ pipeline {
         }
       }
     }
+    stage('Delete deployed image') {
+        agent {
+          label 'ec2-agent'
+        }
+        steps{
+          script {
+            sh "docker rmi ${IMAGE_NAME}:${BUILD_NUMBER}"
+            sh "docker rmi ${IMAGE_NAME}:latest"
+          }
+        }
+      } 
   }
   post {
     success {
@@ -57,7 +68,7 @@ pipeline {
     }
     always {
       node('ec2-agent') {
-        sh 'docker rmi $(docker images -q) --force'
+        sh 'docker rmi $(docker images -q)'
         cleanWs()
       }
     }
