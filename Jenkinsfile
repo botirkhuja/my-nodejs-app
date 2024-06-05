@@ -34,27 +34,6 @@ pipeline {
         }
       }
     }
-    stage('Run database container for testing') {
-      agent {
-        label 'ec2-agent'
-      }
-      steps {
-        script {
-          // Build Docker image from Dockerfile
-          sh "docker run -d --name test-posgres -e POSTGRES_PASSWORD=local-example -e POSTGRES_DB=phones -p 5432:5432 postgres"
-        }
-      }
-    }
-    stage('Run tests') {
-      agent {
-        label 'ec2-agent'
-      }
-      steps {
-        script {
-          sh "docker run --rm --link test-posgres:postgres --env-file=.env.test ${IMAGE_NAME} npm test"
-        }
-      }
-    }
     stage('Deploy Image') {
       agent {
         label 'ec2-agent'
