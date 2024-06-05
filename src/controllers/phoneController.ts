@@ -36,8 +36,13 @@ export const createPhone = async (
     screen_size,
     has_touchscreen,
   } = req.body;
-
   try {
+
+    if (!name || !storage_size || !storage_type || !has_audio_jack || !has_wifi || !has_camera || !camera_quality || !screen_size || !has_touchscreen) {
+      res.status(STATUS_CODES.HTTP_STATUS_BAD_REQUEST).json({ message: 'Missing required fields' });
+      return;
+    }
+
     const phone = await Phone.create({
       name,
       storage_size,
@@ -49,6 +54,12 @@ export const createPhone = async (
       screen_size,
       has_touchscreen
     });
+
+    if (!phone) {
+      res.status(STATUS_CODES.HTTP_STATUS_BAD_REQUEST).json({ message: 'Invalid phone data' });
+      return;
+    }
+
     res.status(STATUS_CODES.HTTP_STATUS_CREATED).json(phone);
   } catch (error) {
     res.status(STATUS_CODES.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong' });
