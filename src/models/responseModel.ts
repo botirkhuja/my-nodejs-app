@@ -1,0 +1,1 @@
+export type MessageRes = { message: string };

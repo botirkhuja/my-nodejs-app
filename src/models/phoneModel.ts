@@ -21,7 +21,9 @@ export interface PhoneQueryI {
   audioJack?: string;
   wifi?: string;
   camera?: string;
+  cameraQuality?: string;
   touchscreen?: string;
+  screenSize?: string;
 }
 
 export interface PhoneCreationI extends Optional<PhoneI, 'id'> {};

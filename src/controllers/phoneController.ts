@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import Phone, { PhoneI, PhoneQueryI } from '../models/phoneModel';
-import { WhereOptions } from 'sequelize';
-import { Op } from 'sequelize';
+import Phone, { PhoneI } from '../models/phoneModel';
 import { constants as STATUS_CODES } from 'http2';
+import { getWhereOptions, isPhoneFound, isPhoneIdValid } from './helpers';
+import { MessageRes } from '../models/responseModel';
 
-type MessageRes = { message: string };
 type IdParams = { id: string };
 
 export const getPhones = async (
@@ -55,11 +54,6 @@ export const createPhone = async (
       has_touchscreen
     });
 
-    if (!phone) {
-      res.status(STATUS_CODES.HTTP_STATUS_BAD_REQUEST).json({ message: 'Invalid phone data' });
-      return;
-    }
-
     res.status(STATUS_CODES.HTTP_STATUS_CREATED).json(phone);
   } catch (error) {
     res.status(STATUS_CODES.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong' });
@@ -72,53 +66,19 @@ export const getPhoneById = async (
 ) => {
   const { id } = req.params;
 
+  if (!isPhoneIdValid(id, res)) {
+    return;
+  }
+
   try {
     const phone = await Phone.findByPk(id);
-    if (!phone) {
-      res.status(STATUS_CODES.HTTP_STATUS_NOT_FOUND).json({ message: 'Phone not found' });
+    if (!isPhoneFound(phone, res)) {
       return;
     }
     res.json(phone);
   } catch (error) {
     res.status(STATUS_CODES.HTTP_STATUS_INTERNAL_SERVER_ERROR).json({ message: 'Something went wrong' });
   }
-}
-
-const getWhereOptions = (query: PhoneQueryI): WhereOptions<PhoneI> => {
-  const where: WhereOptions<PhoneI> = {};
-
-  if (query.name) {
-    where.name = {
-      [Op.like]: `%${query.name}%`
-    };
-  }
-
-  if (query.storage) {
-    const storageSize = parseInt(query.storage.toString());
-    where.storage_size = storageSize;
-  }
-
-  if (query.audioJack) {
-    const audioJackString = query.audioJack.toString();
-    where.has_audio_jack = audioJackString === 'true' || audioJackString === '1';
-  }
-
-  if (query.wifi) {
-    const wifiString = query.wifi.toString();
-    where.has_wifi = wifiString === 'true' || wifiString === '1';
-  }
-
-  if (query.camera) {
-    const cameraString = query.camera.toString();
-    where.has_camera = cameraString === 'true' || cameraString === '1';
-  }
-
-  if (query.touchscreen) {
-    const touchscreenString = query.touchscreen.toString();
-    where.has_touchscreen = touchscreenString === 'true' || touchscreenString === '1';
-  }
-
-  return where;
 }
 
 export const updatePhoneById = async (
@@ -128,10 +88,13 @@ export const updatePhoneById = async (
   const { id } = req.params;
   const phoneData = req.body;
 
+  if (!isPhoneIdValid(id, res)) {
+    return;
+  }
+
   try {
     const phone = await Phone.findByPk(id);
-    if (!phone) {
-      res.status(STATUS_CODES.HTTP_STATUS_NOT_FOUND).json({ message: 'Phone not found' });
+    if (!isPhoneFound(phone, res)) {
       return;
     }
     await phone.update(phoneData);
@@ -147,10 +110,13 @@ export const deletePhoneById = async (
 ) => {
   const { id } = req.params;
 
+  if (!isPhoneIdValid(id, res)) {
+    return;
+  }
+
   try {
     const phone = await Phone.findByPk(id);
-    if (!phone) {
-      res.status(STATUS_CODES.HTTP_STATUS_NOT_FOUND).json({ message: 'Phone not found' });
+    if (!isPhoneFound(phone, res)) {
       return;
     }
     await phone.destroy();
