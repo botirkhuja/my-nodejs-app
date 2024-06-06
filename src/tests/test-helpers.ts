@@ -1,7 +1,8 @@
 import { PhoneI } from "../models/phoneModel";
 
-export const phoneMock = (phone?: Partial<PhoneI>): Omit<PhoneI, 'id'> => {
+export const mockPhoneData = (phone?: Partial<PhoneI>): PhoneI => {
   return {
+    id: phone?.id || 1,
     name: phone?.name || 'test phone',
     storage_size: phone?.screen_size || 128,
     storage_type: phone?.storage_type || 'GB',
