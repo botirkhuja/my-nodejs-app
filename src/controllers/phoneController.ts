@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Phone, { PhoneI } from '../models/phoneModel';
 import { constants as STATUS_CODES } from 'http2';
-import { getWhereOptions, isPhoneFound, isPhoneIdValid } from './helpers';
+import { getWhereOptions, isDefined, isDefinedAndNotNull, isPhoneFound, isPhoneIdValid } from './helpers';
 import { MessageRes } from '../models/responseModel';
 
 type IdParams = { id: string };
@@ -37,8 +37,33 @@ export const createPhone = async (
   } = req.body;
   try {
 
-    if (!name || !storage_size || !storage_type || !has_audio_jack || !has_wifi || !has_camera || !camera_quality || !screen_size || !has_touchscreen) {
+    const isRequiredFieldsNotNull = [
+      name,
+      has_audio_jack,
+      has_wifi,
+      has_camera,
+      has_touchscreen
+    ].every(isDefinedAndNotNull);
+
+    if (!isRequiredFieldsNotNull) {
+      res.status(STATUS_CODES.HTTP_STATUS_BAD_REQUEST).json({ message: 'Invalid value for required fields' });
+      return;
+    }
+
+    const isEveryFieldDefined = [
+      storage_size,
+      storage_type,
+      camera_quality,
+      screen_size,
+    ].every(isDefined);
+
+    if (!isEveryFieldDefined) {
       res.status(STATUS_CODES.HTTP_STATUS_BAD_REQUEST).json({ message: 'Missing required fields' });
+      return;
+    }
+
+    if (name.trim() === '') {
+      res.status(STATUS_CODES.HTTP_STATUS_BAD_REQUEST).json({ message: 'Name cannot be empty' });
       return;
     }
 

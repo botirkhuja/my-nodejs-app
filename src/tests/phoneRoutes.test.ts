@@ -51,20 +51,25 @@ describe('POST /api/phones', () => {
     expect(response.status).toBe(201);
     expect(response.body.name).toBe(mockData.name);
   });
+  it('should give error for missing field', async () => {
+    const mockData = phoneMock();
+    const response = await request(app).post('/api/phones').send({ ...mockData, name: undefined });
+    expect(response.status).toBe(400);
+  });
 });
 
-describe('Patch /api/phones/:id', () => {
+describe('Put /api/phones/:id', () => {
   it('should update a phone name', async () => {
     const mockData = phoneMock({ name: 'test phone 1' });
     const phone = await Phone.create(mockData);
-    const response = await request(app).patch(`/api/phones/${phone.id}`).send({ name: 'updated phone' });
+    const response = await request(app).put(`/api/phones/${phone.id}`).send({ name: 'updated phone' });
     expect(response.status).toBe(200);
     expect(response.body.name).toBe('updated phone');
     expect(response.body.storage_size).toBe(phone.storage_size);
   });
 
   it('should return 404 if phone not found', async () => {
-    const response = await request(app).patch('/api/phones/999').send({ name: 'updated phone' });
+    const response = await request(app).put('/api/phones/999').send({ name: 'updated phone' });
     expect(response.status).toBe(404);
   });
 });

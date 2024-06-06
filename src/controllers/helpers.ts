@@ -66,3 +66,11 @@ export const isPhoneFound = (phone: Phone | null, res: Response<MessageRes>): ph
   }
   return true;
 }
+
+export const isDefined = <T>(value: T | undefined): value is T => {
+  return value !== undefined;
+}
+
+export const isDefinedAndNotNull = <T>(value: T | null | undefined): value is T => {
+  return isDefined(value) && value !== null;
+}
