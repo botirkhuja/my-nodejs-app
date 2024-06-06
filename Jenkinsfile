@@ -51,7 +51,7 @@ pipeline {
       }
       steps {
         script {
-          sh "docker run --rm --link test-posgres:postgres --env-file=.env.test ${IMAGE_NAME} npm test"
+          sh "docker run --rm --link --env-file=.env.test ${IMAGE_NAME} npm test"
         }
       }
     }
